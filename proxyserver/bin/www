@@ -1,0 +1,63 @@
+#!/usr/bin/env node
+
+(function () {
+    // Module dependencies.
+    const app = require('../app');
+    const debug = require('debug')('myapp:server');
+    const http = require('http');
+
+    // Get port from environment and store in Express.
+    const port = normalizePort(process.env.PORT || '3006');
+    app.set('port', port);
+
+    // Create HTTP Server
+    const server = http.createServer(app);
+
+    // Run a timer to refresh the token every few hours
+    // const getToken = require('../api/getToken');
+    // getToken(true);
+    // setInterval(() => {
+    //     getToken(true); // force get a new token
+    // },6*60*60*1000); // 6 hours
+
+
+    // Listen on provided port, on all network interfaces.
+    server.listen(port);
+    server.on('error', onError);
+    server.on('listening', onListening);
+
+    // Normalize a port into a number, string, or false.
+    function normalizePort(val) {
+        const port = parseInt(val, 10);
+        return (isNaN(port)) ? val : (port >= 0) ? port : false;
+    }
+
+    // Event listener for HTTP server "error" event.
+    function onError(error) {
+        const bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+        // sanity check
+        if (error.syscall !== 'listen') throw error;
+
+        // handle specific listen errors with friendly messages
+        switch (error.code) {
+            case 'EACCES':
+                console.error(bind + ' requires elevated privileges');
+                process.exit(1);
+                break;
+            case 'EADDRINUSE':
+                console.error(bind + ' is already in use');
+                process.exit(1);
+                break;
+            default:
+                throw error;
+        }
+    }
+
+    // Event listener for HTTP server "listening" event.
+    function onListening() {
+        const addr = server.address();
+        const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+        debug('Listening on ' + bind);
+    }
+})();
